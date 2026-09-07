@@ -1,0 +1,32 @@
+{
+  "name": "wow-pvp-feed",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "sync": "npx tsx src/lib/run-sync.ts"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "node-cron": "^4.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@eslint/eslintrc": "^3.3.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
