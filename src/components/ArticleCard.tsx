@@ -24,7 +24,17 @@ export function ArticleCard({ article }: { article: PvpArticle }) {
       <h2 className="font-[family-name:var(--font-display)] text-lg leading-snug text-[#f3ead0] group-hover:text-[#f6d56b]">
         {article.title}
       </h2>
-      <p className="mt-3 flex-1 text-sm leading-relaxed text-[#c9c2b0]">{article.summary}</p>
+      <div className="mt-3 flex-1">
+        {article.pvpExcerpt && (
+          <div className="mb-2.5 rounded border border-[#d4af37]/30 bg-[#251e11]/80 px-3 py-2 text-xs text-[#f6e5b0]">
+            <span className="font-bold uppercase tracking-wider text-[#f6d56b]">PvP Changes Found: </span>
+            <span className="text-[#e2dac3]">{article.pvpExcerpt}</span>
+          </div>
+        )}
+        {(!article.pvpExcerpt || article.summary !== article.pvpExcerpt) && (
+          <p className="text-sm leading-relaxed text-[#c9c2b0]">{article.summary}</p>
+        )}
+      </div>
       <a
         href={article.link}
         target="_blank"

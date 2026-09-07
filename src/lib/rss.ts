@@ -1,8 +1,7 @@
 import Parser from "rss-parser";
 import type { RawFeedItem, SourceId } from "./types";
 
-const BROWSER_UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0";
+const FEED_UA = "curl/8.5.0";
 
 export const FEEDS: { source: SourceId; urls: string[] }[] = [
   { source: "Wowhead", urls: ["https://www.wowhead.com/news/rss/retail"] },
@@ -10,7 +9,7 @@ export const FEEDS: { source: SourceId; urls: string[] }[] = [
     source: "MMO-Champion",
     urls: [
       "https://www.mmo-champion.com/external.php?do=rss&type=newcontent&sectionid=1&days=14&count=25",
-      "https://news.google.com/rss/search?q=site:mmo-champion.com+World+of+Warcraft&hl=en-US&gl=US&ceid=US:en",
+      "https://www.mmo-champion.com/external.php?do=rss&type=newcontent&sectionid=1&days=30&count=40",
     ],
   },
   {
@@ -25,8 +24,11 @@ export const FEEDS: { source: SourceId; urls: string[] }[] = [
 const parser = new Parser({
   timeout: 15000,
   headers: {
-    "User-Agent": BROWSER_UA,
+    "User-Agent": FEED_UA,
     Accept: "application/rss+xml, application/xml, text/xml, */*",
+  },
+  customFields: {
+    item: ["content:encoded", "description"],
   },
 });
 
@@ -35,6 +37,7 @@ function stripHtml(html: string) {
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
+    .replace(/\[\/?(?:b|i|u|url|quote|code|list|ul|li|font|color)[^\]]*\]/gi, " ")
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&quot;/gi, '"')
@@ -48,7 +51,7 @@ function stripHtml(html: string) {
 async function fetchXml(url: string) {
   const response = await fetch(url, {
     headers: {
-      "User-Agent": BROWSER_UA,
+      "User-Agent": FEED_UA,
       Accept: "application/rss+xml, application/xml, text/xml, */*",
     },
     cache: "no-store",
@@ -59,6 +62,39 @@ async function fetchXml(url: string) {
   }
 
   return response.text();
+}
+
+export async function scrapeArticlePage(url: string): Promise<string | null> {
+  let targetUrl = url;
+  // Canonicalize Wowhead URLs (e.g. /news=12345/slug -> /news/slug-12345) to avoid redirect/202 loops
+  const wowheadMatch = url.match(/wowhead\.com\/news=(\d+)\/([^\/?#]+)/);
+  if (wowheadMatch) {
+    targetUrl = `https://www.wowhead.com/news/${wowheadMatch[2]}-${wowheadMatch[1]}`;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 7000);
+
+    const response = await fetch(targetUrl, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "curl/8.5.0",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+      redirect: "follow",
+    });
+
+    clearTimeout(timer);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.text();
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchSourceFeed(source: SourceId, urls: string[]): Promise<RawFeedItem[]> {
@@ -72,7 +108,13 @@ export async function fetchSourceFeed(source: SourceId, urls: string[]): Promise
         .map((item) => {
           const title = (item.title ?? "").trim();
           const link = (item.link ?? item.guid ?? "").trim();
-          const description = stripHtml(item.contentSnippet ?? item.content ?? "");
+          const raw =
+            (item["content:encoded"] as string | undefined) ||
+            item.content ||
+            item.description ||
+            item.contentSnippet ||
+            "";
+          const description = stripHtml(raw);
           const pubDate = item.isoDate || item.pubDate || new Date().toISOString();
           return { title, link, pubDate, source, description };
         })

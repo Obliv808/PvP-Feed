@@ -1,0 +1,6 @@
+{
+  "name": "WoW PvP Feed",
+  "description": "Cached World of Warcraft PvP news from Wowhead, MMO-Champion, and Icy Veins.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

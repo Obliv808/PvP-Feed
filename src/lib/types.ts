@@ -7,6 +7,7 @@ export interface PvpArticle {
   pubDate: string;
   source: SourceId;
   summary: string;
+  pvpExcerpt?: string;
 }
 
 export interface RawFeedItem {
