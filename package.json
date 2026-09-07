@@ -10,6 +10,7 @@
     "sync": "npx tsx src/lib/run-sync.ts"
   },
   "dependencies": {
+    "lucide-react": "^1.41.0",
     "next": "^16.0.0",
     "node-cron": "^4.2.1",
     "react": "^19.0.0",

@@ -11,7 +11,8 @@ A high-performance, automated World of Warcraft PvP intelligence aggregator. It 
 - **Zero-Token Local Gatekeeper**: Evaluates incoming articles with a fast, keyword and section-density rule engine with zero API costs.
 - **Optional AI Classifier**: Supports opt-in OpenAI integration (`gpt-4o-mini`) for edge-case NLP classification if desired.
 - **PvP Excerpt Callouts**: Highlights the exact PvP changes directly on the card so players don't have to scroll through pages of PvE raid and dungeon notes.
-- **Instant Client Search & Filtering**: Filter by source or search dynamically by class (e.g., *Mage*, *Paladin*, *Death Knight*) or format (*Solo Shuffle*, *Blitz*, *Arena*).
+- **PvP Topic & Class Filters**: Filter by PvP topic (*Class Tuning & Balance*, *Solo Shuffle & Arenas*, *Battlegrounds & Blitz*, *Seasons & Gear*, *AWC & Tournaments*) or quick-filter by any of the 13 World of Warcraft classes with signature class colors.
+- **Instant Client Search**: Search dynamically by spell, ability, class, or keyword.
 - **Persistent Local Cache**: Saves articles and synchronization timestamps in `data/pvp-feed.json` for instant, resilient page loads.
 - **Automated 30-Minute Synchronization**: Next.js server instrumentation runs a background cron job every 30 minutes, with support for Vercel Cron and manual triggers.
 
